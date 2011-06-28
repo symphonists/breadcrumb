@@ -23,6 +23,16 @@
 		public function grab(&$param_pool){
 			$result = new XMLElement($this->dsParamROOTELEMENT);
 			
+			$ext_man = $this->_Parent->ExtensionManager;						
+			
+			// detect if multilangual field AND language redirect is enabled
+			$isMultiLangual = ($ext_man ->fetchStatus('multilingual_field') == EXTENSION_ENABLED && $ext_man ->fetchStatus('language_redirect') == EXTENSION_ENABLED);
+			
+			// add a ref to the Language redirect
+			if ($isMultiLangual) {
+				require_once (EXTENSIONS . '/language_redirect/lib/class.languageredirect.php');
+			}
+			
 			$current_page_id = (int)$this->_env['param']['current-page-id'];
 			
 			$db = ASDCLoader::instance();
@@ -39,9 +49,27 @@
 				
 				$current = $results->current();
 				
-				$result->prependChild(
-					new XMLElement('page', $current->title, array('path' => trim("{$current->path}/{$current->handle}", '/')))
-				);
+				$child = new XMLElement('page', $current->title,  array('path' => trim("{$current->path}/{$current->handle}", '/')));
+				
+				if ($isMultiLangual) {
+					try {
+						// current language
+						$lg = LanguageRedirect::instance()->getLanguageCode();
+						// get object as array
+						$c = get_object_vars($current);
+						// get the current handle
+						$h = $c["page_lhandles_h_$lg"];
+						
+						// get the parent(s) handles
+						$path = '';
+						
+						$child = new XMLElement('page', $c["page_lhandles_t_$lg"],  array('path' => trim("{$path}/{$h}", '/')));
+					} catch (Exception $e) {
+						// do nothing, leave the $child as is
+					}
+				}
+				
+				$result->prependChild($child);
 				
 				if(is_null($current->parent)) break;
 
@@ -50,6 +78,30 @@
 			}
 
 			return $result;
+		}
+		
+		public function getLocalizedParentPath($current, $db, $lg) {
+			
+			$path = '';
+			$results = NULL;
+		
+			do {
+			
+				if(is_null($current->parent)) return $path;
+			
+				$results = $db->query(sprintf("SELECT * FROM `tbl_pages` WHERE `id` = '%d' LIMIT 1", (int)$current->parent));
+				
+				$current = $results->current();
+				
+				// get object as array
+				$c = get_object_vars($current);
+				
+				// prepend to path
+				$path = '/' . $c["page_lhandles_h_$lg"] . $path;
+			
+			} while($results->length() > 0) ;
+			
+			return $path;
 		}
 	}
 
