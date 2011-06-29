@@ -20,88 +20,193 @@
 					 'release-date' => '2009-01-02');	
 		}
 
+		/**
+		 * 
+		 * Method called by Symphony in order to build the 
+		 * @param $param_pool
+		 * @return XMLElement
+		 */
 		public function grab(&$param_pool){
-			$result = new XMLElement($this->dsParamROOTELEMENT);
 			
+			// save the ext manager pointer
 			$ext_man = $this->_Parent->ExtensionManager;						
 			
 			// detect if multilangual field AND language redirect is enabled
-			$isMultiLangual = ($ext_man ->fetchStatus('multilingual_field') == EXTENSION_ENABLED && $ext_man ->fetchStatus('language_redirect') == EXTENSION_ENABLED);
+			$isMultiLangual = ($ext_man ->fetchStatus('multilingual_field') == EXTENSION_ENABLED && 
+							   $ext_man ->fetchStatus('language_redirect') == EXTENSION_ENABLED);
 			
 			// add a ref to the Language redirect
 			if ($isMultiLangual) {
 				require_once (EXTENSIONS . '/language_redirect/lib/class.languageredirect.php');
 			}
 			
+			// get the current page id
 			$current_page_id = (int)$this->_env['param']['current-page-id'];
 			
+			// save the pointer to the db
 			$db = ASDCLoader::instance();
 			
+			// prepare output
+			$result = new XMLElement($this->dsParamROOTELEMENT);
+			
+			// create a pointer to the flat array
+			$flat = null;
+			
 			try{
-				$results = $db->query("SELECT * FROM `tbl_pages` WHERE `id` = '{$current_page_id}' LIMIT 1");
+				// Try to get the flat array
+				// i.e. ['my-post-post','member','my-blog'] for the /my-blog/member/my-post-post/ URL
+				$flat = $this->getHierarchy($db, $current_page_id, $isMultiLangual);
 			}
 			catch(Exception $e){
-				$result->appendChild(new XMLElement('error', General::sanitize(vsprintf('%d: %s on query "%s"', $db->lastError()))));
+				$this->appendError($result, vsprintf('%d: %s on query "%s"', $db->lastError()));
+				// exit now
 				return $result;
 			}
 			
-			while($results->length() > 0){
+			if (count($flat) > 0) {
 				
-				$current = $results->current();
+				// we need to build the correct urls
+				$this->buildPath($flat, $isMultiLangual);
 				
-				$child = new XMLElement('page', $current->title,  array('path' => trim("{$current->path}/{$current->handle}", '/')));
+				//  reverse order to have the parents first
+				$flat = array_reverse($flat);
 				
-				if ($isMultiLangual) {
-					try {
-						// current language
-						$lg = LanguageRedirect::instance()->getLanguageCode();
-						// get object as array
-						$c = get_object_vars($current);
-						// get the current handle
-						$h = $c["page_lhandles_h_$lg"];
-						
-						// get the parent(s) handles
-						$path = '';
-						
-						$child = new XMLElement('page', $c["page_lhandles_t_$lg"],  array('path' => trim("{$path}/{$h}", '/')));
-					} catch (Exception $e) {
-						// do nothing, leave the $child as is
+				// generate the output
+				foreach ($flat as $value) {
+					
+					// @todo add a setting for that
+					if (strlen($value['path']) > 0) {
+						$this->appendPage($result, $value);
 					}
 				}
 				
-				$result->prependChild($child);
-				
-				if(is_null($current->parent)) break;
-
-				$results = $db->query(sprintf("SELECT * FROM `tbl_pages` WHERE `id` = '%d' LIMIT 1", (int)$current->parent));
-				
+			} else {
+				$this->appendError($result, __('No records found'));
 			}
-
+			
+			// return xml result set
 			return $result;
 		}
 		
-		public function getLocalizedParentPath($current, $db, $lg) {
+		/**
+		 * 
+		 * Generate a "flat" view of the current page and ancestors
+		 * return array of all pages, starting with the current page
+		 * @param $db
+		 * @param $current_page_id
+		 * @param $isMultiLangual
+		 */
+		private function getHierarchy(&$db, $current_page_id, $isMultiLangual) {
+			$flat = array();
+			$cid = $current_page_id;
 			
-			$path = '';
-			$results = NULL;
-		
+			$cols = "id, parent, title, handle";
+			
+			if ($isMultiLangual) {
+				
+				// current language
+				$lg = LanguageRedirect::instance()->getLanguageCode();
+				
+				// modify SQL query
+				$cols = "id, parent, page_lhandles_t_$lg as title, page_lhandles_h_$lg as handle";
+			}
+			
+			// do it once, and then repeat if needed
 			do {
-			
-				if(is_null($current->parent)) return $path;
-			
-				$results = $db->query(sprintf("SELECT * FROM `tbl_pages` WHERE `id` = '%d' LIMIT 1", (int)$current->parent));
 				
-				$current = $results->current();
+				$results = $db->query("SELECT $cols FROM `tbl_pages` WHERE `id` = '{$cid}' LIMIT 1");
 				
-				// get object as array
-				$c = get_object_vars($current);
+				if ($results->length() > 0) {
+					$current = $results->current();
+					
+					// sanitize title
+					$current->title = General::sanitize($current->title);
+					
+					// save the result in flat view
+					array_push($flat, get_object_vars($current));
+					
+					// update pointer
+					$cid = (int) $current->parent;
+					
+				} else {
+					// exit
+					$cid = -1; 
+				}
 				
-				// prepend to path
-				$path = '/' . $c["page_lhandles_h_$lg"] . $path;
+				// clean meme
+				$results = null;
 			
-			} while($results->length() > 0) ;
+			} while ($cid > 0);
 			
-			return $path;
+			return $flat;
 		}
+		
+		/**
+		 * 
+		 * Appends a new field 'path' in each array in $flat 
+		 * @param array $flat
+		 */
+		private function buildPath(&$flat, $isMultiLangual) {
+			$count = count($flat);
+			
+			for ($i = 0; $i < $count; $i++) { // for each element
+				
+				// pointer to the path to be build
+				$path = '';
+				
+				for ($j = $i; $j < $count; $j++) { // iterate foward in order to build the path
+					
+					// handle to be prepend
+					$handle = $flat[$j]['handle'];
+					
+					// if handle if not empty
+					if (strlen($handle) > 0) {
+						$path = $handle . '/' . $path;
+					}
+				}
+				
+				// assure dash is starting the path
+				// @todo add a setting for that
+				//$path = '/' . $path;
+				
+				if ($isMultiLangual && // then path starts with language Code
+					strlen($path) > 1) { 
+				
+					// current language
+					$lg = LanguageRedirect::instance()->getLanguageCode();
+					
+					// prepand $lg
+					$path  = "$lg/" . $path;
+				
+				}
+				
+				// save path in array
+				$flat[$i]['path'] = trim($path, '/');
+			}
+		}
+		
+		/**
+		 * 
+		 * Quickly appends a error xml node to the result
+		 * @param XMLElement $result
+		 * @param string $msg
+		 */
+		private function appendError(&$result, $msg) {
+			$result->appendChild(new XMLElement('error', General::sanitize($msg)));
+		}
+		
+		/**
+		 * 
+		 * Quickly appends a error xml node to the result
+		 * @param XMLElement $result
+		 * @param array $value
+		 */
+		private function appendPage(&$result, $value) {
+			$result->appendChild(new XMLElement('page', 
+									$value['title'], // value
+									array('path'=>$value['path']) // attributes
+								));
+		}
+		
 	}
 
