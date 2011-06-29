@@ -1,9 +1,8 @@
 <?php
 
 	require_once(TOOLKIT . '/class.datasource.php');
-	require_once(EXTENSIONS . '/asdc/lib/class.asdc.php');
 	
-	Class datasourceBreadcrumb extends Datasource{
+	Class datasourceBreadcrumb extends Datasource {
 		
 		public $dsParamROOTELEMENT = 'breadcrumb';
 		
@@ -16,8 +15,30 @@
 							'name' => 'Alistair Kearney',
 							'website' => 'http://pointybeard.com',
 							'email' => 'alistair@symphony21.com'),
-					 'version' => '1.0',
-					 'release-date' => '2009-01-02');	
+					 'version' => '1.1',
+					 'release-date' => '2011-06-29');	
+		}
+		
+		public function __construct(&$parent, Array $env = null, $process_params=true){
+			parent::__construct($parent, $env, $process_params);
+
+			// Include ASDC, if it exists...
+			if(!class_exists('ASDCLoader')) {
+				try {
+					if((include_once(EXTENSIONS . '/asdc/lib/class.asdc.php')) === FALSE) {
+						// if the include did not raise any exception , raise a dummy one
+						throw new Exception();
+					}
+				} catch (Exception $e) {
+					throw new SymphonyErrorPage(
+						__('Please make sure that the ASDC extension is installed and enabled at %s.', array('<code>' . EXTENSIONS . '/asdc/</code>')) 
+						. '<br/><br/>' . 
+						__('It\'s available at %s.', array('<a href="https://github.com/pointybeard/asdc/tree">github.com/pointybeard/asdc/tree</a>')), 
+						__('ASDC not found')
+					);
+				}
+				
+			}
 		}
 
 		/**
