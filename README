@@ -1,10 +1,10 @@
 Breadcrumb
 ------------------------------------
 
-Version: 1.0
-Author: Alistair Kearney (alistair@symphony21.com)
-Build Date: 2nd Jan 2009
-Requirements: Latest Symphony 2 build, ASDC Library v1.0
+Version: 1.1
+Author: Alistair Kearney (alistair@symphony21.com); Solutions Nitriques (open-source (at) nitriques.com)
+Build Date: 2011-07-03
+Requirements: Latest Symphony 2 build
 
 Includes a Data Source that, based on the current page, will provide a focused XML structure representing the
 parent hierarchy. It is more efficient than a conventional Navigation DS, since there is less redundant data
@@ -13,16 +13,13 @@ and is much easier to traverse with xpath.
 
 [REQUIREMENTS]
 
-- This Extension relies on the "Advanced Symphony Database Connector" (ASDC) library. Read more about it 
-  at http://github.com/pointybeard/asdc/tree/master and grab the latest stable version using 
-  "git clone git://github.com/pointybeard/asdc.git". 
+- Latest Symphony 2 build
+- Compatible with the Multilangual Field and Language Redirect extensions
 
 
 [INSTALLATION]
 
 ** Note: The latest version can always be grabbed with "git clone git://github.com/pointybeard/breadcrumb.git"
-
-I. Install "ASDC" as mentioned in requirements ("git clone git://github.com/pointybeard/asdc.git")
 
 1. Upload the 'breadcrumb' folder in this archive to your Symphony 'extensions' folder.
 
