@@ -30,7 +30,7 @@
 							'name' => 'Alistair Kearney',
 							'website' => 'http://pointybeard.com',
 							'email' => 'alistair@symphony21.com'),
-					 'version' => '1.1',
+					 'version' => 'Breadcrumb 1.1',
 					 'release-date' => '2011-07-03'
 			);
 		}
