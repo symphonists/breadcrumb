@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension id="breadcrumb" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
+	<name>Breadcrumb</name>
+	<description>Includes a Data Source that, based on the current page, will provide a focused XML structure representing the parent hierarchy. It is more efficient than a conventional Navigation DS, since there is less redundant data and is much easier to traverse with XPath.</description>
+	<repo type="github">https://github.com/symphonists/breadcrumb</repo>
+	<url type="discuss">http://symphony-cms.com/discuss/thread/32781/</url>
+	<types>
+		<type>Data Sources</type>
+	</types>
+	<authors>
+		<author>
+			<name github="symphonists" symphony="community">Alistair Kearney; Symphony CMS</name>
+			<website>http://symphony-cms.com/</website>
+		</author>
+		<author>
+			<name github="Solutions-Nitriques" symphony="nitriques">Solutions Nitriques</name>
+			<website>http://www.nitriques.com/open-source/</website>
+		</author>
+	</authors>
+	<dependencies>
+		<!-- None -->
+	</dependencies>
+	<releases>  
+		<release version="1.1" date="2011-07-03" min="2.2">  
+	- Compatible with the Multilingual Field and Language Redirect extensions
+		</release>
+		<release version="1.0" date="2009-01-02" min="2.2">  
+	- First release
+		</release>
+	</releases>
+</extension>
