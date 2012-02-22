@@ -24,7 +24,7 @@
 		<release version="1.1" date="2011-07-03" min="2.2">  
 	- Compatible with the Multilingual Field and Language Redirect extensions
 		</release>
-		<release version="1.0" date="2009-01-02" min="2.2">  
+		<release version="1.0" date="2009-01-02" max="2.2">  
 	- First release
 		</release>
 	</releases>
