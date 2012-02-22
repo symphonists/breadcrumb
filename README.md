@@ -25,8 +25,3 @@ Includes a Data Source that, based on the current page, will provide a focused X
 		<page path="about/contact/office">Our Office</page>
 	</breadcrumb>
 	
-## Changelog
-
-1.1 
-
-- Compatible with the Multilingual Field and Language Redirect extensions
