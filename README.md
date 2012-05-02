@@ -1,9 +1,9 @@
 # Breadcrumb
 
-- Version: 1.1
-- Date: July 3rd, 2011
-- Author: Alistair Kearney (alistair@symphony21.com); Solutions Nitriques (open-source (at) nitriques.com)
-- Requirements: Symphony 2.2+
+- Version: 1.2
+- Author: Symphony Community (https://github.com/symphonists)
+- Build Date: 2012-05-02
+- Requirements: Symphony 2.3.x
 
 Includes a Data Source that, based on the current page, will provide a focused XML structure representing the parent hierarchy. It is more efficient than a conventional Navigation DS, since there is less redundant data and is much easier to traverse with XPath.
 

@@ -9,23 +9,22 @@
 	</types>
 	<authors>
 		<author>
-			<name github="symphonists" symphony="community">Alistair Kearney; Symphony CMS</name>
-			<website>http://symphony-cms.com/</website>
-		</author>
-		<author>
-			<name github="Solutions-Nitriques" symphony="nitriques">Solutions Nitriques</name>
-			<website>http://www.nitriques.com/open-source/</website>
+			<name github="symphonists" symphony="community">Symphony Community</name>
 		</author>
 	</authors>
 	<dependencies>
 		<!-- None -->
 	</dependencies>
 	<releases>  
-		<release version="1.1" date="2011-07-03" min="2.2">  
-	- Compatible with the Multilingual Field and Language Redirect extensions
+		<release version="1.2" date="2012-05-02" min="2.3.x">
+			- Compatible with Symphony 2.3
+			- Using new PageManager
 		</release>
-		<release version="1.0" date="2009-01-02" max="2.2">  
-	- First release
+		<release version="1.1" date="2011-07-03" min="2.2">
+			- Compatible with the Multilingual Field and Language Redirect extensions
+		</release>
+		<release version="1.0" date="2009-01-02" max="2.2">
+			- First release
 		</release>
 	</releases>
 </extension>
