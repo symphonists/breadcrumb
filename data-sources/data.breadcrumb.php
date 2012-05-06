@@ -28,7 +28,7 @@
 			return array('name' => 'Breadcrumb', 
 			             'version' => 'Breadcrumb 1.2',
 			             'release-date' => '2012-05-02',			
-			             'author' => array('name' => 'Symphony Community'));
+			             'author' => array('name' => 'Symphony Community', 'website' => 'https://github.com/symphonists/'));
 		}
 
 		/**
