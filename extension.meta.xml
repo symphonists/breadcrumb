@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <extension id="breadcrumb" status="released" xmlns="http://symphony-cms.com/schemas/extension/1.0">
 	<name>Breadcrumb</name>
-	<description>Includes a Data Source that, based on the current page, will provide a focused XML structure representing the parent hierarchy. It is more efficient than a conventional Navigation DS, since there is less redundant data and is much easier to traverse with XPath.</description>
+	<description>A datasource that provides XML representing the parent hierarchy. Useful for building breadcrumb navigation.</description>
 	<repo type="github">https://github.com/symphonists/breadcrumb</repo>
 	<url type="discuss">http://symphony-cms.com/discuss/thread/32781/</url>
 	<types>
