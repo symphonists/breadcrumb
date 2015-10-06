@@ -84,7 +84,7 @@
 			
 				$path = implode('/', array_slice($handles, 0, $key + 1));
 			
-				$result->appendChild(new XMLElement( 'page', $title, array('path'=>$path) ));
+				$result->appendChild(new XMLElement( 'page', htmlentities($title), array('path'=>$path) ));
 			}
 
 			// return xml result set
